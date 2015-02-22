@@ -64,8 +64,12 @@ INSERT INTO
   questions (title, body, users_id)
 VALUES
   ('How do I use sqlite3?', 'Im confused', 2),
+<<<<<<< HEAD
   ('Best place to retire to?', 'Im really old', 3),
   ('Who the hell took my teeth!?!', '#pudding', 3);
+=======
+  ('Best place to retire to?', 'Im really old', 3);
+>>>>>>> 8f5471e020887840e071ccf27ac5c6f51692f406
 
 INSERT INTO
   question_followers (question_id, follower_id)
@@ -86,5 +90,9 @@ INSERT INTO
 VALUES
   (2, 1),
   (1, 3),
+<<<<<<< HEAD
   (2, 3),
   (2, 2);
+=======
+  (2, 3);
+>>>>>>> 8f5471e020887840e071ccf27ac5c6f51692f406

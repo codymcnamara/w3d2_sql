@@ -1,9 +1,12 @@
 require 'singleton'
 require 'sqlite3'
+<<<<<<< HEAD
 require_relative 'question_followers'
 require_relative 'user'
 require_relative 'question'
 require_relative 'question_like'
+=======
+>>>>>>> 8f5471e020887840e071ccf27ac5c6f51692f406
 
 class QuestionsDatabase < SQLite3::Database
   include Singleton
@@ -21,6 +24,108 @@ class QuestionsDatabase < SQLite3::Database
   end
 end
 
+<<<<<<< HEAD
+=======
+class User
+
+  def self.all
+    # execute a SELECT; result in an `Array` of `Hash`es, each
+    # represents a single row.
+    results = QuestionsDatabase.instance.execute('SELECT * FROM users')
+    results.map { |result| User.new(result) }
+  end
+
+  attr_accessor :id, :fname, :lname
+
+  def initialize(options={})
+    @id = options['id']
+    @fname = options['fname']
+    @lname = options['lname']
+  end
+
+  def authored_questions
+    asked_questions = []
+    found = QuestionsDatabase.instance.execute(<<-SQL, @user_id)
+    SELECT * FROM questions WHERE questions.users_id = ?
+    SQL
+    found.each {|question| asked_questions << Question.new(question)}
+
+    asked_questions
+  end
+
+  def authored_replies
+    Reply.find_by_user(@id)
+  end
+
+  def self.find_by_id(user_id)
+    found = QuestionsDatabase.instance.execute(<<-SQL, user_id)
+      SELECT * FROM users WHERE id = ?
+      SQL
+      User.new(found.first)
+    # should return an instance of our User class!
+    # NOT the data hash returned by the QuestionsDatabase!
+
+  end
+
+  def self.find_by_name(fname, lname)
+    found = QuestionsDatabase.instance.execute(<<-SQL, fname, lname)
+    SELECT * FROM users WHERE fname = ? AND lname = ?
+    SQL
+    User.new(found.first)
+  end
+
+end
+
+class Question
+  attr_accessor :id, :title, :body, :users_id
+
+  def initialize(options={})
+    @id = options['id']
+    @title = options['title']
+    @body = options['body']
+    @users_id = options['users_id']
+  end
+
+  def self.find_by_id(question_id)
+    found = QuestionsDatabase.instance.execute(<<-SQL, question_id)
+    SELECT * FROM questions WHERE id = ?
+    SQL
+    Question.new(found.first)
+  end
+
+  def self.find_by_author_id(author_id)
+    user = User.find_by_id(author_id)
+    user.authored_questions
+  end
+
+  def author
+    User.find_by_id(@users_id)
+  end
+
+  def replies
+    Reply.find_by_question_id(@id)
+  end
+
+end
+
+class QuestionFollowers
+  attr_accessor :id, :question_id, :follower_id
+
+  def initialize(options ={})
+    @id = options['id']
+    @question_id = options['question_id']
+    @follower_id = options['follower_id']
+  end
+
+  def self.find_by_id(id)
+    found = QuestionsDatabase.instance.execute(<<-SQL, id)
+    SELECT * FROM question_followers WHERE id = ?
+    SQL
+    QuestionFollowers.new(found.first)
+  end
+
+end
+>>>>>>> 8f5471e020887840e071ccf27ac5c6f51692f406
 
 class Reply
   attr_accessor :reply_id, :subject, :reply_parent, :reply_user, :reply_body
@@ -84,8 +189,34 @@ class Reply
 
 end
 
+<<<<<<< HEAD
 bob = User.find_by_id(3)
 # p QuestionFollowers.most_followed_questions(2)
 # question = Question.find_by_id(1)
 # p question.num_likes
 p bob.average_karma
+=======
+
+class QuestionLikes
+  attr_accessor :question_like, :liked_question, :user_who_liked
+
+  def initialize(options ={})
+    @question_like = options['question_like']
+    @liked_question = options['liked_question']
+    @user_who_liked = options['user_who_liked']
+  end
+
+  def self.find_by_id(question_like)
+    found = QuestionsDatabase.instance.execute(<<-SQL, question_like)
+    SELECT * FROM question_likes WHERE question_like = ?
+    SQL
+    QuestionLikes.new(found.first)
+  end
+end
+
+#bob = User.find_by_id(3)
+parent_reply = Reply.find_by_id(1)
+#child_reply = Reply.find_by_id(2)
+#q = Question.find_by_id(1)
+p parent_reply.child_replies
+>>>>>>> 8f5471e020887840e071ccf27ac5c6f51692f406
